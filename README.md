@@ -3,7 +3,7 @@
 Szakdolgozat projekt a Miskolci Egyetem Gépészmérnöki és Informatikai Kar Programtervező informatikus BSc képzésén.
 
 ## A dolgozat címe és témája
-* **Cím:** Adatbázis-sémák elemzése és grafikus vizualizációja asztali környezetben
+* **Cím:** Relációs séma és diagram szerkesztő alkalmazás fejlesztése
 * **Konzulens:** Dr. Tompa Tamás
 * **Szakmai konzulens / Architektúra tanácsadó:** Piller Imre, Dr. Tompa Tamás
 
@@ -26,6 +26,6 @@ A szoftver kiemelt figyelmet fordít a biztonságra (SQL injection megelőzése 
 4. **Biztonsági validáció:** Beépített input validációk és szűrések a biztonságos adatkezelés és az SQL injekciók megelőzése érdekében.
 
 ## Projekt Struktúra
-- `docs/` - Dokumentumok, szakdolgozat sablonok, irodalomkutatás és összehasonlító táblázatok
+- `Docs/` - Dokumentumok, szakdolgozat sablonok, irodalomkutatás és összehasonlító táblázatok
 - `src/` - Forráskódok
 - `README.md` - Projekt áttekintés és dokumentáció
