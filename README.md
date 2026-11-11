@@ -12,6 +12,12 @@ A szakdolgozat célja egy olyan asztali grafikus felhasználói felülettel (GUI
 
 A szoftver kiemelt figyelmet fordít a biztonságra (SQL injection megelőzése a séma lekérdezése során) és a rugalmas exportálási lehetőségekre (PNG és SVG vektoros formátumok), hogy a generált diagramok közvetlenül beilleszthetők legyenek dokumentációkba vagy prezentációkba.
 
+## Projekt Struktúra
+- `docs/` - Rendszertervek, felületi leírások (`felulet.md`) és piackutatás (`piackutatas.md`)
+- `szakdolgozat/` - A szakdolgozat szöveges dokumentuma
+- `editor/` - A Java Swing alapú szerkesztő és parser forráskódjai
+- `README.md` - Projekt áttekintés
+
 ## Technológiai Stack
 * **Nyelv:** Java
 * **UI keretrendszer:** Java Swing
@@ -27,5 +33,5 @@ A szoftver kiemelt figyelmet fordít a biztonságra (SQL injection megelőzése 
 
 ## Projekt Struktúra
 - `Docs/` - Dokumentumok, szakdolgozat sablonok, irodalomkutatás és összehasonlító táblázatok
-- `src/` - Forráskódok
+- `editor/` - Forráskódok
 - `README.md` - Projekt áttekintés és dokumentáció
