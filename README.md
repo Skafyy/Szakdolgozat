@@ -33,5 +33,5 @@ A szoftver kiemelt figyelmet fordít a biztonságra (SQL injection megelőzése 
 
 ## Projekt Struktúra
 - `Docs/` - Dokumentumok, szakdolgozat sablonok, irodalomkutatás és összehasonlító táblázatok
-- `editor/` - Forráskódok
+- `Editor/` - Forráskódok
 - `README.md` - Projekt áttekintés és dokumentáció
