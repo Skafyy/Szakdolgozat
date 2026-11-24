@@ -49,9 +49,9 @@ A piacon elérhető eszközök összehasonlításakor nem elégséges csupán a 
 ## 5. Alternatív Eszközök és Szöveges Ábragenerátorok
 
 Az adatbázis-sémák vizualizálására és dokumentálására nemcsak dedikált adatbázis-tervezők, hanem más kategóriájú eszközök is léteznek:
-- **Általános diagramszerkesztők (draw.io, DIA):** Rugalmas, szabadkézi grafikai szerkesztést biztosítanak, de hiányzik belőlük az adatbázis-séma alapú automatikus validáció, a közvetlen fájlkezelés és a séma-export.
+- **Általános diagramszerkesztők ([draw.io / diagrams.net](https://www.drawio.com/), [Dia](http://dia-installer.de/)):** Rugalmas, szabadkézi grafikai szerkesztést biztosítanak, de hiányzik belőlük az adatbázis-séma alapú automatikus validáció, a közvetlen fájlkezelés és a séma-export.
 - **UML szerkesztők:** Kiválóak az objektumorientált szoftvertervezéshez, de a relációs adatbázisok fizikai sajátosságai (indexek, triggerek, adattípus-specifikumok) háttérbe szorulnak bennük.
-- **Szöveges ábragenerátorok (PlantUML, Mermaid, TikZ):** 
+- **Szöveges ábragenerátorok ([PlantUML](https://plantuml.com/), [Mermaid](https://mermaid.js.org/), [TikZ](https://tikz.dev/)):**
   - *PlantUML / Mermaid:* Nagyon hatékonyak verziókezelés szempontjából (szöveges leírásból generálnak diagramot), de interaktív, egérműveletes vizuális szerkesztésre közvetlenül nem alkalmasak.
   - *TikZ:* Kiváló minőségű, professzionális LaTeX kimenetet ad, de a szerkesztési ideje túl magas egy dinamikus, interaktív tervezőhöz képest.
 

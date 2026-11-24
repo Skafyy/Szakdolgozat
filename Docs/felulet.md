@@ -1,85 +1,81 @@
-# Felhasználói felület és működés
+# Felhasználói felület és rendszerterv
 
-Ez a dokumentum bemutatja az adatbázis-séma elemző és vizualizáló alkalmazás grafikus felépítését, működési logikáját, hibakezelési elveit és látványvilágát.
-
-## 1. A felület felépítése
-
-Az alkalmazás egy asztali ablak (Java Swing alapokon, FlatLaf modern megjelenéssel), amely a következő főbb részekből áll:
-
-```text
-+-------------------------------------------------------------+
-| [1] Felső menüsáv (Fájl megnyitása, Exportálás, Kilépés)    |
-+---------------------+---------------------------------------+
-|                     |                                       |
-|  [2]                |          [3] Rajzvászon (Diagram)     |
-|  Bal oldali panel   |          (Interaktív dobozok és       |
-|  (Séma fastruktúra) |           összekötő nyilak,           |
-|                     |           drag-and-drop mozgatás)     |
-|                     |                                       |
-+---------------------+---------------------------------------+
-|  [4] Eszköztár (Nagyítás, kicsinyítés, alapállapot)         |
-+-------------------------------------------------------------+
-```
-
-* **[1] Felső menüsáv:** Itt érhetők el az alapvető funkciók (Fájl megnyitása, Exportálás PNG/SVG formátumba, Kilépés).
-* **[2] Bal oldali panel (Séma lista):** Egy fastruktúra, amely kilistázza a beolvasott adatbázis tábláit és azok mezőit a gyors áttekinthetőség érdekében.
-* **[3] Középső rajzvászon (Diagram nézet):** Ez a fő munkaterület. Itt jelenik meg maga az adatbázis-diagram. A táblákat dobozokként, a közöttük lévő kapcsolatokat (idegen kulcsok) pedig összekötő vonalakként mutatja.
-* **[4] Eszköztár:** Gombok a diagram nagyításához (zoom), kicsinyítéséhez és az alapállapot visszaállításához.
+Ez a dokumentum bemutatja az adatbázis-séma elemző és vizualizáló alkalmazás grafikus felépítését, komponens-architektúráját, működési folyamatait, állapotátmeneteit, hibakezelési stratégiáját és vizuális specifikációját.
 
 ---
 
-## 2. A program működése és állapotai
+## 1. A felület felépítése és komponens-architektúra
 
-A szoftver használata az alábbi lépésekből és programállapotokból áll:
+Az alkalmazás főablaka egy `JFrame` keretben, modern **FlatLaf** megjelenéssel épül fel. Az elrendezés `BorderLayout` és `JSplitPane` konténerekre támaszkodik, hogy az ablak átméretezésekor a munkaterület dinamikusan alkalmazkodjon.
 
-### Működési lépések:
-1. **Beolvasás:** A felhasználó tallózással kiválaszt egy SQL séma fájlt.
-2. **Ellenőrzés:** A program a háttérben leellenőrzi a bemenetet (biztonsági szűrés, pl. SQL injection ellen).
-3. **Feldolgozás:** A beépített elemző (parser) kinyeri a táblákat, mezőket és a kapcsolatokat.
-4. **Interaktív megjelenítés:** A program kirajzolja a diagramot a középső vászonra. A felhasználó az egérrel szabadon mozgathatja (drag-and-drop) a táblákat, hogy a legátláthatóbb elrendezést kapja.
-5. **Exportálás:** A végleges elrendezést a felhasználó kimentheti képként (PNG) vagy nagyítható, vektoros formátumban (SVG) prezentációkhoz és dokumentációkhoz.
+![A felhasználói felület felépítése](images/felulet_felepites.png)
+*1. ábra: A főablak elrendezése és főbb komponensei*
 
-### Állapotdiagram
+### A főbb felületi elemek specifikációja
 
-```mermaid
-stateDiagram-v2
-    [*] --> Indulas
-    Indulas --> FajlValasztas: Fájl tallózása
-    FajlValasztas --> BiztonsagiSzures: SQL séma betöltése
-    
-    state FeldolgozasiFozis {
-        BiztonsagiSzures --> ParserFuttatas: Bemenet ellenőrzése (Siker)
-        BiztonsagiSzures --> HibaKezeles: Érvénytelen / Sérült bemenet
-        ParserFuttatas --> GrafikusKirajzolas: Táblák és kapcsolatok kinyerése
-    }
-    
-    HibaKezeles --> [*]
-    GrafikusKirajzolas --> SzerkesztoNezet
-    
-    state SzerkesztoNezet {
-        [*] --> AlapNezet
-        AlapNezet --> Mozgatas: Dobozok átrendezése (Drag & Drop)
-        Mozgatas --> Zoomolás: Nagyítás / Kicsinyítés
-        Zoomolás --> Exportalas: Mentés PNG / SVG formátumban
-    }
-    
-    SzerkesztoNezet --> [*]
-```
+| Azonosító | Swing komponens | Feladat és működés |
+| :--- | :--- | :--- |
+| **1. Felső menüsáv** | `JMenuBar` (`JMenu`, `JMenuItem`) | Központi vezérlőpont billentyűparancsokkal: SQL fájl megnyitása (`Ctrl+O`), diagram exportálása PNG/SVG formátumba (`Ctrl+E`), vászon visszaállítása (`Ctrl+0`), kilépés. |
+| **2. Bal oldali panel** | `JTree` (`DefaultTreeModel`) | Hierarchikus áttekintést nyújt a betöltött `SchemaModel` objektumról. Gyökéreleme az adatbázis/fájl neve, alatta a táblák (`Table`), azokon belül pedig az attribútumok (`Column`) típus- és kulcsjelöléssel. Egy táblára kattintva a vászon automatikusan arra a csomópontra fókuszál és kijelöli azt. |
+| **3. Középső rajzvászon** | Egyedi `JPanel` (`Graphics2D`) | A fő vizuális munkaterület. Saját `paintComponent(Graphics g)` metódussal rajzolja ki a rácsos hátteret, a táblákat és az idegen kulcs kapcsolatokat. Az egérműveleteket `MouseListener`, `MouseMotionListener` és `MouseWheelListener` kezeli. |
+| **4. Alsó eszköztár** | `JToolBar` + `JLabel` | Gyorsgombok a nagyításhoz (Zoom In / Out), az alapértelmezett 100%-os nézet visszaállításához, valamint egy állapotsor a betöltött táblák számának és az aktuális nagyítási aránynak a kijelzésére. |
+
+---
+
+## 2. Működési folyamat és állapotmodell
+
+A rendszer működését tervezési szempontból két külön nézetben vizsgáljuk: a **felhasználói munkafolyamat** (aktivitási diagram) a használat lépéseit, míg az **alkalmazás állapotgépe** (állapotdiagram) szigorúan a szoftver belső állapotait és az azokat kiváltó eseményeket írja le.
+
+### 2.1. Felhasználói munkafolyamat (Aktivitási diagram)
+
+A program indításától az exportálásig terjedő tipikus használati folyamat:
+
+![Felhasználói munkafolyamat](images/folyamatabra.png)
+*2. ábra: A séma betöltésének és szerkesztésének munkafolyamata*
+
+### 2.2. Az alkalmazás állapotdiagramja (State Machine)
+
+Az alábbi diagram kizárólag a rendszer belső állapotait és a felhasználói/rendszeresemények hatására bekövetkező állapotátmeneteket ábrázolja:
+
+![Alkalmazás állapotdiagram](images/allapotdiagram.png)
+*3. ábra: A felhasználói felület és a vászon állapotdiagramja*
+
+### 2.3. Grafikus transzformáció és élrajzolási logika
+
+* **Vászon transzformáció (`AffineTransform`):** A nagyítás (zoom) és az eltolás (pan) nem módosítja a táblák logikai koordinátáit; a `Graphics2D` kontextusra alkalmazott transzformációs mátrix végzi a leképzést, így az SVG és PNG exportálás mindig az eredeti, torzításmentes koordinátákból dolgozik.
+* **Dinamikus kapcsolat-illesztés:** Két tábla között húzódó idegen kulcs (`FK`) kapcsolat esetén a rendszer a két téglalap középpontjának relatív helyzetéből számítja ki, hogy a csatlakozási pont a dobozok melyik oldalára (felső, alsó, bal vagy jobb él közepére) essen, így vonszolás közben a vonalak folyamatosan követik a táblákat.
 
 ---
 
 ## 3. Hibakezelési stratégia
 
-A felületen és a háttérfolyamatokban fellépő hibák kezelése a következő módon történik:
-* **Fájlbeolvasási vagy szintaktikai hiba:** Ha a kiválasztott fájl nem megfelelő formátumú, vagy szintaktikai hibát tartalmaz az SQL séma, a program nem omlik össze, hanem egy jól látható modális hibaablakban *(Dialog)* figyelmezteti a felhasználót a hiba pontos soráról és okáról.
-* **Biztonsági szűrési hiba:** Potenciálisan veszélyes vagy kártékony utasítások észlelésekor a feldolgozás azonnal megszakad, és a rendszer biztonsági naplózást (log) kezdeményez.
-* **Üres vagy nem létező séma:** Amennyiben a beolvasott fájl nem tartalmaz feldolgozható táblákat, a bal oldali fastruktúra és a rajzvászon üres marad, egy információs felirattal irányítva át a felhasználót.
+A rendszer a bemeneti fájlok feldolgozása és a fájlműveletek során védekező (*defensive*) megközelítést alkalmaz. Hiba esetén a korábban betöltött érvényes séma (ha volt) nem sérül.
+
+| Hiba kategóriája | Kiváltó ok | Detektálás helye | Rendszer reakciója és felhasználói visszajelzés |
+| :--- | :--- | :--- | :--- |
+| **Fájlkezelési hiba** | Nem létező fájl, jogosultsági hiány, üres (0 bájtos) fájl. | I/O réteg (`Files.readString`) | `JOptionPane.ERROR_MESSAGE` ablak a pontos I/O hibaok megjelölésével; a vászon állapota változatlan marad. |
+| **Biztonsági / tiltott utasítás** | Kártékony vagy nem DDL jellegű SQL kulcsszavak (pl. `DROP`, `DELETE`, `UPDATE`, `EXEC`, `ATTACH`) jelenléte. | Előszűrő / Lexer validátor | A feldolgozás azonnal megszakad; figyelmeztető párbeszédablak jelenik meg a tiltott kulcsszó és a sorszám megjelölésével. |
+| **Szintaktikai hiba** | Hibás `CREATE TABLE` szerkezet, lezáratlan zárójel vagy hiányzó adattípus. | Szintaktikai elemző (Parser) | Strukturált `ParseException` dobása sor- és oszlopszámmal, amelyet a UI egy modális hibaablakban jelenít meg. |
+| **Szemantikai inkonzisztencia** | Az `FK` hivatkozás olyan táblára vagy oszlopra mutat, amely nem szerepel a fájlban. | Modellépítő (SchemaBuilder) | Figyelmeztetés megjelenítése a státuszsorban; a létező táblák kirajzolásra kerülnek, a hiányzó hivatkozás pedig nem okoz `NullPointerException`-t. |
+| **Üres séma** | Szintaktikailag helyes fájl, de nem tartalmaz `CREATE TABLE` utasítást. | Parser kimenet ellenőrzés | Információs üzenet (`INFORMATION_MESSAGE`): *„A kiválasztott fájl nem tartalmaz megjeleníthető tábladefiníciót.”* |
+| **Exportálási hiba** | Írásvédett célkönyvtár vagy megtelt háttértár PNG/SVG mentéskor. | Export modul | Hibaablak a fájlrendszeri hiba leírásával; a szerkesztett vászonállapot megmarad, a mentés újrapróbálható. |
 
 ---
 
-## 4. Látványvilág és stílus
+## 4. Látványvilág és vizuális specifikáció
 
-A cél egy letisztult, modern és könnyen átlátható felület biztosítása. 
-* **Színvilág és Tipográfia:** A szoftver a modern FlatLaf dizájnelemeket követi. A táblákat reprezentáló dobozok fejléce (a tábla neve) kiemelt, kontrasztos háttérszínt kap a könnyebb vizuális szétválasztás érdekében.
-* **Kulcsok jelölése:** A primer kulcsok (Primary Key) és az idegen kulcsok (Foreign Key) egyértelmű vizuális jelöléssel (egyedi ikonokkal és félkövér betűtípussal) vannak megkülönböztetve a mezőlistában.
-* **Kapcsolatok vizualizációja:** A táblák közötti relációkat dinamikusan igazodó, tiszta vonalak (nyilak) kötik össze, amelyek követik a dobozok drag-and-drop mozgatását a rajzvásznon.
+A felület célja a magas kontrasztú, jól olvasható és dokumentációba közvetlenül beilleszthető diagramok előállítása.
+
+* **Téma és tipográfia:**
+  * Az ablak kerete és vezérlői a **FlatLaf** (*FlatLightLaf* / *FlatDarkLaf*) témát használják.
+  * A táblanevek megjelenítéséhez félkövér, a mezőnevekhez és adattípusokhoz pedig egyenletes karakterközű vagy jól tagolt sans-serif betűtípus (`Segoe UI` / `SansSerif`, 12–14 pt) tartozik.
+* **Tábladobozok (`TableNode`) vizuális felépítése:**
+  * Lekerekített sarkú, vékony kerettel ellátott téglalap, amely két fő zónára oszlik:
+    1. **Fejléc:** Kiemelt háttérszínnel ellátott sáv, amely középre igazítva tartalmazza a tábla nevét.
+    2. **Attribútumlista:** Soronként megjeleníti a mező kulcs-státuszát, nevét és adattípusát.
+* **Kulcsok és megkötések jelölése:**
+  * **Elsődleges kulcs (`PK`):** Kiemelt színű jelvény vagy ikon és **félkövér** mezőnév.
+  * **Idegen kulcs (`FK`):** Elkülönülő színű jelvény és *dőlt* vagy aláhúzott jelölés, hogy vizuálisan azonnal azonosítható legyen a kapcsolat kiindulópontja.
+  * **Kötelező mező (`NOT NULL`):** Csillag (`*`) vagy halványított jelzőcímke a típus mellett.
+* **Kapcsolati élek (`RelationEdge`):**
+  * Simított élsimítással (`RenderingHints.KEY_ANTIALIASING`) rajzolt irányított vonalak, amelyek a hivatkozó táblától (`FK`) a hivatkozott tábla (`PK`) felé mutató nyílheggyel végződnek. Kijelöléskor a kapcsolódó táblák és az őket összekötő vonalak kiemelt keretszínt kapnak.
