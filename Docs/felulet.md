@@ -8,7 +8,7 @@ Ez a dokumentum bemutatja az adatbázis-séma elemző és vizualizáló alkalmaz
 
 Az alkalmazás főablaka egy `JFrame` keretben, modern **FlatLaf** megjelenéssel épül fel. Az elrendezés `BorderLayout` és `JSplitPane` konténerekre támaszkodik, hogy az ablak átméretezésekor a munkaterület dinamikusan alkalmazkodjon.
 
-![A felhasználói felület felépítése](images/felulet_felepites.png)
+![A felhasználói felület felépítése](Images/felulet_felepites.png)
 *1. ábra: A főablak elrendezése és főbb komponensei*
 
 ### A főbb felületi elemek specifikációja
@@ -30,14 +30,14 @@ A rendszer működését tervezési szempontból két külön nézetben vizsgál
 
 A program indításától az exportálásig terjedő tipikus használati folyamat:
 
-![Felhasználói munkafolyamat](images/folyamatabra.png)
+![Felhasználói munkafolyamat](Images/folyamatabra.png)
 *2. ábra: A séma betöltésének és szerkesztésének munkafolyamata*
 
 ### 2.2. Az alkalmazás állapotdiagramja (State Machine)
 
 Az alábbi diagram kizárólag a rendszer belső állapotait és a felhasználói/rendszeresemények hatására bekövetkező állapotátmeneteket ábrázolja:
 
-![Alkalmazás állapotdiagram](images/allapotdiagram.png)
+![Alkalmazás állapotdiagram](Images/allapotdiagram.png)
 *3. ábra: A felhasználói felület és a vászon állapotdiagramja*
 
 ### 2.3. Grafikus transzformáció és élrajzolási logika
